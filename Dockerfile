@@ -10,6 +10,9 @@ WORKDIR "/project"
 # This is for my apt-cacher:
 COPY apt.conf.proxy /etc/apt/apt.conf.d/01proxy
 
+
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN /usr/bin/apt-get update && \
     /usr/bin/apt-get --yes --no-install-recommends --fix-broken --fix-missing install \
         apt-utils && \
