@@ -30,7 +30,8 @@ RUN /usr/bin/apt-get update && \
         g++ \
         cmake \
         bash \
-        cppcheck && \
+        cppcheck \
+        doxygen && \
     /bin/rm -rf /var/cache/apt/*
 
 
