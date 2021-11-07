@@ -29,6 +29,7 @@ RUN /usr/bin/apt-get update && \
         gcc \
         g++ \
         cmake \
+        ccache \
         bash \
         cppcheck \
         doxygen && \
