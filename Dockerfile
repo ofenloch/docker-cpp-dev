@@ -1,4 +1,4 @@
-FROM debian:11.1
+FROM debian:11.1 as cpp-dev-base
 
 LABEL maintainer="Oliver Ofenloch <57812959+ofenloch@users.noreply.github.com>"
 LABEL version="0.0.1"
@@ -38,6 +38,37 @@ RUN /usr/bin/apt-get update && \
 
 RUN /usr/sbin/groupadd --force --gid ${NEW_GID} ${NEW_USER_NAME} && \
     /usr/sbin/useradd --create-home --gid=${NEW_GID} --uid=${NEW_UID} --shell=${SHELL} --home-dir=${HOME_DIRECTORY} --password=${NEW_PASSWD_ENCRYPTED} ${NEW_USER_NAME}
+
+# We won't use the cpp-dev-base image. So there's no USER and no ENTRYPOINT.
+# USER ${NEW_USER_NAME}:${NEW_USER_NAME}
+# ENTRYPOINT [ "bash", "-c" ]
+
+
+# This is for my OpenModelica development:
+
+FROM cpp-dev-base AS cpp-dev-openoodeilca
+
+RUN /usr/bin/apt-get update && \
+    /usr/bin/apt-get --yes --no-install-recommends --fix-broken --fix-missing install \
+        clang \
+        gfortran \
+        default-jdk \
+        ant \
+        hwloc \
+        libexpat1 \
+        libhwloc-dev \
+        libexpat1-dev \
+        libboost-all-dev \
+        liblapack-dev \
+        libblas-dev \
+        libhdf5-dev \
+        libcurl4-openssl-dev \
+        uuid-dev \
+        lp-solve \
+        coinor-libipopt-dev \
+        libsundials-dev \
+        && \
+    /bin/rm -rf /var/cache/apt/*
 
 USER ${NEW_USER_NAME}:${NEW_USER_NAME}
 
