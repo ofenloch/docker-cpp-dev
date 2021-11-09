@@ -44,9 +44,10 @@ RUN /usr/sbin/groupadd --force --gid ${NEW_GID} ${NEW_USER_NAME} && \
 # ENTRYPOINT [ "bash", "-c" ]
 
 
-# This is for my OpenModelica development:
-
-FROM cpp-dev-base AS cpp-dev-openoodeilca
+########################################
+# This is the builder for OpenModelica #
+########################################
+FROM cpp-dev-base AS cpp-dev-openoodelica-builder
 
 RUN /usr/bin/apt-get update && \
     /usr/bin/apt-get --yes --no-install-recommends --fix-broken --fix-missing install \
@@ -70,6 +71,24 @@ RUN /usr/bin/apt-get update && \
         && \
     /bin/rm -rf /var/cache/apt/*
 
+# From now on all commands ar run as this user:
 USER ${NEW_USER_NAME}:${NEW_USER_NAME}
 
-ENTRYPOINT [ "bash", "-c" ]
+# /bin/bash: "If the -c option is present, then commands are read from the first non-option argument command_string.  If 
+#             there are arguments after the command_string, the first  argument  is assigned to $0 and any remaining 
+#             arguments are assigned to the positional parameters.  The assignment to $0 sets the name of the shell, which 
+#             is used in warning and error messages."
+#
+# This means: The container executes /bin/bash -c "the given argument" and terminates after the command is done.
+# So, calling 
+#              docker run --rm -it -v $(pwd):/project cpp-dev:0.0.1 "ls -hal /project"
+# starts the container, runs the given command (i.e. "ls -hal /project") in bash and terminates.
+#
+# To keep the conatiner alive, we would need an ENTRYPOINT that does never finish ...
+#
+# We could do this, for example:
+#             docker run --rm -v $(pwd):/project cpp-dev-openmodelica:0.0.1 "sleep infinity"
+# and then go into the container with something like
+#             docker exec -it beautiful_hugle bash
+#
+ENTRYPOINT [ "/bin/bash", "-c" ]
